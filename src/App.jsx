@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
-import loginService from './services/login' 
+import loginService from './services/login'
+import './index.css'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [newBlog, setNewBlog] = useState('')
   const [showAll, setShowAll] = useState(true)
-  const [errorMessage, setErrorMessage] = useState(null)
+  const [errorMessage, setErrorMessage] = useState("")
+  const [confirmMessage, setConfirmMessage] = useState("");
   const [username, setUsername] = useState('') 
   const [password, setPassword] = useState('') 
   const [user, setUser] = useState(null)
@@ -43,10 +45,12 @@ const App = () => {
     setUser(user)
     setUsername('')
     setPassword('')
+    setConfirmMessage("user logged in");
+          setTimeout(() => setConfirmMessage(""), 5000);
   } catch (exception) {
     setErrorMessage('Wrong credentials')
     setTimeout(() => {
-      setErrorMessage(null)
+      setErrorMessage("")
     }, 5000)
   }
 }
@@ -70,14 +74,24 @@ const App = () => {
     setTitle('')
     setAuthor('')
     setUrl('')
+    setConfirmMessage("a new blog " + blogObject.title + " by " + blogObject.author + " added");
+          setTimeout(() => setConfirmMessage(""), 5000);
   }
 
+const Notification = ({ message, classText }) => {
+  if (message === "") {
+    return null;
+  }
+
+  return <div className={classText}>{message}</div>;
+};
 
   if (user === null) {
     return (
       <div>
         <h2>Log in to application</h2>
-        {/*<Notification message={errorMessage} />*/}
+        <Notification message={confirmMessage} classText={"message"} />
+        <Notification message={errorMessage} classText={"error"} />
 
       <form onSubmit={handleLogin}>
         <div>
@@ -107,6 +121,8 @@ const App = () => {
   return (
     <div>
       <h2>blogs</h2>
+      <Notification message={confirmMessage} classText={"message"} />
+      <Notification message={errorMessage} classText={"error"} />
       <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p> 
       {blogs.map(blog =>
         <Blog key={blog.id} blog={blog} />
